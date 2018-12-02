@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/res">
+        <file>nasa.jpg</file>
+    </qresource>
+</RCC>
