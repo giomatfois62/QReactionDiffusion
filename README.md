@@ -6,4 +6,6 @@ qmake
 make
 sudo make install
 ```
-NB: Graphics are rendered onscreen with OpenGL
+NB: Graphics are rendered onscreen with OpenGL  
+
+![alt text](https://raw.githubusercontent.com/giomatfois62/Reaction-Diffusion/master/screenshot.png)
