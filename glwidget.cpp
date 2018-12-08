@@ -36,21 +36,6 @@ void GLWidget::setTexture(const QImage &img)
     texture->setMagnificationFilter(QOpenGLTexture::Linear);
 }
 
-void GLWidget::mousePressEvent(QMouseEvent *e)
-{
-
-}
-
-void GLWidget::mouseReleaseEvent(QMouseEvent *e)
-{
-
-}
-
-void GLWidget::mouseMoveEvent(QMouseEvent *e)
-{
-
-}
-
 void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
@@ -87,7 +72,7 @@ void GLWidget::initializeGL()
     program.link();
     program.bind();
 
-    texture = new QOpenGLTexture(QImage(":/res/nasa.jpg"));
+    texture = new QOpenGLTexture(QImage());
     texture->setMinificationFilter(QOpenGLTexture::Nearest);
     texture->setMagnificationFilter(QOpenGLTexture::Linear);
 
@@ -129,6 +114,7 @@ void GLWidget::initializeGL()
     vao.release();
     ebo.release();
     vbo.release();
+
     program.release();
 }
 

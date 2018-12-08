@@ -19,10 +19,6 @@ public:
     void setTexture(const QImage &img);
 
 protected:
-    void mousePressEvent(QMouseEvent *e) override;
-    void mouseReleaseEvent(QMouseEvent *e) override;
-    void mouseMoveEvent(QMouseEvent *e) override;
-
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;

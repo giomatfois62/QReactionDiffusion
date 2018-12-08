@@ -7,20 +7,24 @@
 #include <QPainter>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QTimer>
+#include <QLabel>
+#include <QDoubleSpinBox>
 
-#include <cmath>
+#include <map>
 
-using namespace std;
+using namespace  std;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    currentIteration(0),
-    isActive(0)
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    QTimer::singleShot(0, this, &MainWindow::on_reset_clicked);
+    layout = new QFormLayout();
+    loadModels();
+
+    QTimer::singleShot(0, this, &MainWindow::init);
 }
 
 MainWindow::~MainWindow()
@@ -30,31 +34,28 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_reset_clicked()
 {
-    isActive = false;
     init();
-    draw();
 }
 
 void MainWindow::on_start_clicked()
 {
-    isActive = true;
-    QTimer::singleShot(0, this, &MainWindow::render);
+    updateModel();
+    ui->glWidget->start();
 }
 
 void MainWindow::on_stop_clicked()
 {
-    isActive = false;
-    draw();
+    ui->glWidget->stop();
 }
 
 void MainWindow::on_gridSize_editingFinished()
 {
     init();
-    draw();
 }
 
 void MainWindow::on_save_clicked()
 {
+    // TODO: consider doing save operations here (also for saving custom model)
     QString fileName = QFileDialog::getSaveFileName(this,
            tr("Save Picture"), "",
            tr("PNG (*.png);;All Files (*)"));
@@ -69,64 +70,115 @@ void MainWindow::on_save_clicked()
         return;
     }
 
-    pixmap.save(&file, "PNG");
+    ui->glWidget->pixmap().save(&file, "PNG");
 }
 
 void MainWindow::init()
 {
+    ui->glWidget->stop();
+
     int size = ui->gridSize->value();
-    solver.setSize(size);
-    pixmap = QPixmap(size, size);
-
-    solver.b = ui->b->value();
-    solver.d = ui->d->value();
-    solver.dt = ui->dt->value();
-    solver.du = ui->du->value();
-    solver.dv = ui->dv->value();
-
-    int iterations = ui->iterations->value();
-    currentIteration = 0;
-    ui->progress->setMinimum(currentIteration);
-    ui->progress->setMaximum(iterations);
-    ui->progress->setValue(currentIteration);
+    float dt = ui->dt->value();
+    ui->glWidget->init(size, dt);
 }
 
-void MainWindow::draw()
+void MainWindow::loadModels()
 {
-    int size = solver.u0.size();
+    // TODO: load from file
+    m_models = {
+        {"Gray-Scott", {
+             {
+                 {"du", {0,1,0.00002}},
+                 {"dv", {0,1,0.00001}},
+                 {"b", {0,1,0.025}},
+                 {"d", {0,1,0.082}}
+             },
+             "-x*y*y+b-b*x",
+             "x*y*y-d*y"
+         }},
+        {"Fitzhugh-Nagumo", {
+             {
+                 {"du", {0,1,0.00002}},
+                 {"dv", {0,1,0.00001}},
+                 {"b", {0,1,0.04}},
+                 {"d", {0,1,0.1}},
+                 {"lambda", {0,1,0.1}}
+             },
+             "-x*y*y+b-b*x",
+             "x*y*y-d*y"
+         }},
+        {"Custom", {
+             {
+                 {"du", {0,1,0.00002}},
+                 {"dv", {0,1,0.00001}}
+             },
+             "",
+             ""
+         }}
+    };
 
-    QPainter painter(&pixmap);
-    for(int i = 0; i  < size; i++)
-    {
-        for(int j = 0; j < size; j++)
-        {
-            double val = (solver.u0[i][j] - solver.minu) / (solver.maxu - solver.minu);
-            int b = 255 * val;
-            int g = 255 * (1 - val);
+    ui->models->addItems(QStringList(m_models.keys()));
+}
 
-            QColor color = QColor(0, g , b);
-            painter.setPen(color);
+void MainWindow::setModel()
+{
+    Model model = m_models[ui->models->currentText()];
+    Solver *solver = ui->glWidget->solver();
+    solver->setModel(model);
+}
 
-            painter.drawPoint(i, j);
-        }
+void MainWindow::updateModel()
+{
+    Model model = m_models[ui->models->currentText()];
+
+    QMap<QString, QDoubleSpinBox*>::iterator it = params.begin();
+    while (it != params.end()) {
+        QString paramName = it.key();
+        double paramValue = it.value()->value();
+        model.params[paramName.toStdString()].value = paramValue;
+        ++it;
     }
 
-    ui->glWidget->setTexture(pixmap.toImage());
-    ui->glWidget->update();
+    model.fu = ui->fu->text().toStdString();
+    model.fv = ui->fv->text().toStdString();
+
+    Solver *solver = ui->glWidget->solver();
+    solver->setModel(model);
 }
 
-void MainWindow::render()
+void MainWindow::on_models_currentTextChanged(const QString &arg1)
 {
-    int iterations = ui->iterations->value();
+    int rows = layout->rowCount();
+    for (int i = rows -1; i >= 0; --i) {
+        qDebug() << "Removing row " << i;
+        layout->removeRow(i);
+    }
 
-    if(!isActive || currentIteration >= iterations)
-        return;
+    qDebug() << "Setting model " << arg1;
+    Model model = m_models[arg1];
 
-    solver.solve();
-    draw();
+    ui->fu->setText(QString::fromStdString(model.fu));
+    ui->fv->setText(QString::fromStdString(model.fv));
 
-    currentIteration++;
-    ui->progress->setValue(currentIteration);
-    if(currentIteration < iterations)
-        QTimer::singleShot(1, this, &MainWindow::render);
+    // setup ui with spinboxes and linedit for model parameters
+    params.clear();
+    map<string, param>::iterator it = model.params.begin();
+    while (it != model.params.end()) {
+        QLabel *label = new QLabel(QString(it->first.c_str()));
+
+        QDoubleSpinBox *spinbox = new QDoubleSpinBox();
+        spinbox->setDecimals(6);
+        spinbox->setMinimum(it->second.min);
+        spinbox->setMaximum(it->second.max);
+        spinbox->setValue(it->second.value);
+        spinbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+        params.insert(label->text(), spinbox);
+
+        layout->addRow(label, spinbox);
+
+        ++it;
+    }
+
+    ui->params->setLayout(layout);
 }

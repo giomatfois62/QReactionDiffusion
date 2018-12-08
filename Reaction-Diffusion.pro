@@ -28,12 +28,16 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     solver.cpp \
-    glwidget.cpp
+    glwidget.cpp \
+    rdwidget.cpp \
+    tinyexpr.c
 
 HEADERS += \
         mainwindow.h \
     solver.h \
-    glwidget.h
+    glwidget.h \
+    rdwidget.h \
+    tinyexpr.h
 
 FORMS += \
         mainwindow.ui
