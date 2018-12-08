@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QSettings>
 #include <QInputDialog>
+#include <QStandardPaths>
 #include <QDoubleSpinBox>
 
 #include <map>
@@ -89,7 +90,7 @@ void MainWindow::init()
 
 void MainWindow::loadModels()
 {
-    QString path = QCoreApplication::applicationDirPath() + QDir::separator() + QString("models");
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QDir::separator() + QString("models");
     QDir dir(path);
     dir.mkpath(path);
 
@@ -154,7 +155,7 @@ void MainWindow::setModel(Model &model)
 
 void MainWindow::saveModel(const Model &model, const QString &modelName)
 {
-    QString path = QCoreApplication::applicationDirPath();
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     path += QDir::separator() + QString("models");
     QDir dir(path);
     dir.mkpath(path);
@@ -314,7 +315,7 @@ void MainWindow::on_saveModel_clicked()
 
 void MainWindow::on_loadModel_clicked()
 {
-    QString path = QCoreApplication::applicationDirPath();
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     path += QDir::separator() + QString("models");
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load Model"),
