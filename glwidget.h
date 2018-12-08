@@ -28,7 +28,7 @@ private:
     QOpenGLTexture *texture;
     QOpenGLVertexArrayObject vao;
     QOpenGLBuffer vbo, ebo;
-    QMatrix4x4 projection;
+    QMatrix4x4 projection, view;
 };
 
 #endif // GLWIDGET_H

@@ -16,6 +16,8 @@ public:
 
 public slots:
     void init(int size, double dt);
+    void setSize(int size);
+    void setTimeStep(double dt);
     void start();
     void stop();
     void save();
@@ -30,13 +32,18 @@ protected:
     void mouseMoveEvent(QMouseEvent *e) override;
 
 private:
+    float colormapRed(float x);
+    float colormapGreen(float x);
+    float colormapBlue(float x);
+    float clamp(float x, float min, float max);
+
     Solver m_solver;
     QPixmap m_pixmap;
     bool isActive;
 
-    int frame;
+    short frame;
 
-    Matrix u0, u, v0, v;
+    //Matrix u0, u, v0, v;
 };
 
 #endif // RDWIDGET_H

@@ -25,27 +25,29 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
-    solver.cpp \
     glwidget.cpp \
+    main.cpp \
+    mainwindow.cpp \
     rdwidget.cpp \
+    solver.cpp \
     tinyexpr.c
 
 HEADERS += \
-        mainwindow.h \
-    solver.h \
     glwidget.h \
+    mainwindow.h \
     rdwidget.h \
+    solver.h \
     tinyexpr.h
 
 FORMS += \
-        mainwindow.ui
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-RESOURCES += \
-    res.qrc
+SUBDIRS += \
+    Reaction-Diffusion.pro
+
+DISTFILES +=

@@ -92,12 +92,12 @@ void Solver::correct()
     u0 = u1; v0 = v1;
 }
 
-void Solver::solve(Matrix &u0, Matrix &u, Matrix &v0, Matrix &v)
+void Solver::solve(Matrix &u0, Matrix &u, Matrix &v0, Matrix &v, double h, double dt)
 {
     if(!fu_expr || !fv_expr)
         return;
 
-    double h = 2.0f / (size -1);
+    //double h = 2.0f / (size -1);
     double invh = 1.0f / (3 * h * h);
 
     du = m_model.params["du"].value;
@@ -216,7 +216,7 @@ int Solver::compileParams()
     te_variable vars[m_model.params.size() + 2];
 
     int count = 0;
-    map<string, param>::iterator i = m_model.params.begin();
+    map<string, Param>::iterator i = m_model.params.begin();
     while (i != m_model.params.end()) {
         vars[count].name = i->first.c_str();
         vars[count].address = &(i->second.value);

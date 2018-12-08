@@ -7,7 +7,7 @@
 
 #include "tinyexpr.h"
 
-struct param
+struct Param
 {
     double min;
     double max;
@@ -16,7 +16,7 @@ struct param
 
 struct Model
 {
-    std::map<std::string, param> params;
+    std::map<std::string, Param> params;
     std::string fu;
     std::string fv;
 };
@@ -26,7 +26,7 @@ struct Matrix {
     int sizeY;
     double *data;
 
-    Matrix() : sizeX(-1), sizeY(-1) {}
+    Matrix() : sizeX(-1), sizeY(-1), data(nullptr) {}
 
     Matrix(int n, int m)
     {
@@ -37,7 +37,8 @@ struct Matrix {
 
     ~Matrix()
     {
-        delete data;
+        if(data)
+            delete[] data;
     }
 
     double& operator()(const int &i, const int &j)
@@ -59,7 +60,7 @@ public:
     void init();
     void solve();
     void correct();
-    void solve(Matrix &u0, Matrix &u, Matrix &v0, Matrix &v);
+    void solve(Matrix &u0, Matrix &u, Matrix &v0, Matrix &v, double h, double dt);
 
     int size;
     double dt, du, dv, tau, sigma, lambda, k, b, d;

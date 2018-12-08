@@ -40,7 +40,7 @@ void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
 
-    glClearColor(0.9f,0.9f,1.0f,10.f);
+    glClearColor(1.0f,1.0f,1.0f,10.f);
     glEnable(GL_DEPTH_TEST);
 
     projection.setToIdentity();
@@ -50,10 +50,11 @@ void GLWidget::initializeGL()
                                     "#version 330 core\n"
                                     "layout (location = 0) in vec3 pos;\n;"
                                     "layout (location = 1) in vec2 tex;\n;"
+                                    "uniform mat4 mvp;\n"
                                     "out vec2 texCoords;\n;"
                                     "void main()\n"
                                     "{\n"
-                                    "    gl_Position = vec4(pos, 1.0);\n"
+                                    "    gl_Position = mvp * vec4(pos, 1.0);\n"
                                     "    texCoords = tex;\n"
                                     "}"
                                     );
@@ -72,7 +73,7 @@ void GLWidget::initializeGL()
     program.link();
     program.bind();
 
-    texture = new QOpenGLTexture(QImage());
+    texture = new QOpenGLTexture(QImage(100,100,QImage::Format::Format_RGB888));
     texture->setMinificationFilter(QOpenGLTexture::Nearest);
     texture->setMagnificationFilter(QOpenGLTexture::Linear);
 
@@ -116,11 +117,27 @@ void GLWidget::initializeGL()
     vbo.release();
 
     program.release();
+
+    view.setToIdentity();
+    view.lookAt(QVector3D(0,0,2.4), QVector3D(0,0,0), QVector3D(0,1,0));
 }
 
 void GLWidget::resizeGL(int w, int h)
 {
     glViewport( 0, 0, w, h );
+    projection.ortho(QRect(0,0,w,h));
+
+    // Calculate aspect ratio
+    qreal aspect = qreal(w) / qreal(h ? h : 1);
+
+    // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
+    const qreal zNear = 0.01, zFar = 3.0, fov = 45.0;
+
+    // Reset projection
+    projection.setToIdentity();
+
+    // Set perspective projection
+    projection.perspective(fov, aspect, zNear, zFar);
 }
 
 void GLWidget::paintGL()
@@ -129,7 +146,8 @@ void GLWidget::paintGL()
 
     program.bind();
     {
-        //program.setUniformValue("mvp", projection);
+        program.setUniformValue("mvp", projection*view);
+
         texture->bind(0);
         program.setUniformValue("screenTexture", 0);
 
