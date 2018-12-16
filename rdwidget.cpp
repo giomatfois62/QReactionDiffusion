@@ -5,9 +5,11 @@
 
 RDWidget::RDWidget(QWidget *parent) :
     GLWidget(parent),
-    isActive(false)
+    isActive(false),
+    frame(0),
+    m_framesToSkip(10)
 {
-    frame = 0;
+
 }
 
 RDWidget::~RDWidget()
@@ -43,6 +45,11 @@ void RDWidget::setTimeStep(double dt)
     m_solver.setTimeStep(dt);
 }
 
+void RDWidget::setFramesToSkip(uint frames)
+{
+    m_framesToSkip = frames;
+}
+
 void RDWidget::start()
 {
     if(isActive)
@@ -63,7 +70,7 @@ void RDWidget::render()
         return;
 
     m_solver.solve();
-    if((++frame)%10 == 0)
+    if((++frame)%m_framesToSkip == 0)
     {
         frame = 0;
         draw();

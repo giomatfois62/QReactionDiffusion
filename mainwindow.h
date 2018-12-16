@@ -33,6 +33,8 @@ private slots:
 
     void updateModel();
 
+    void on_skipFrames_editingFinished();
+
 protected:
     void showEvent(QShowEvent *event);
 

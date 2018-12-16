@@ -18,6 +18,8 @@ public slots:
     void init(int size, double dt);
     void setSize(int size);
     void setTimeStep(double dt);
+    void setFramesToSkip(uint frames);
+
     void start();
     void stop();
     void save();
@@ -41,7 +43,8 @@ private:
     QPixmap m_pixmap;
     bool isActive;
 
-    short frame;
+    uint frame;
+    uint m_framesToSkip;
 
     //Matrix u0, u, v0, v;
 };

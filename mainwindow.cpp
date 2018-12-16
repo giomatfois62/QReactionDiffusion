@@ -325,3 +325,8 @@ void MainWindow::on_loadModel_clicked()
     if(!fileName.isEmpty())
         loadModel(fileName);
 }
+
+void MainWindow::on_skipFrames_editingFinished()
+{
+    ui->rdWidget->setFramesToSkip(ui->skipFrames->value());
+}
