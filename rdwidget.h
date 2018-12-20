@@ -3,6 +3,7 @@
 
 #include "glwidget.h"
 #include "solver.h"
+#include "surface.h"
 
 class RDWidget : public GLWidget
 {
@@ -13,6 +14,7 @@ public:
     Solver *solver();
 
     QPixmap pixmap() const;
+    Surface surface();
 
 public slots:
     void init(int size, double dt);
@@ -45,8 +47,6 @@ private:
 
     uint frame;
     uint m_framesToSkip;
-
-    //Matrix u0, u, v0, v;
 };
 
 #endif // RDWIDGET_H

@@ -21,31 +21,6 @@ struct Model
     std::string fv;
 };
 
-struct Matrix {
-    int sizeX;
-    int sizeY;
-    double *data;
-
-    Matrix() : sizeX(-1), sizeY(-1), data(nullptr) {}
-
-    Matrix(int n, int m)
-    {
-        sizeX = n;
-        sizeY = m;
-        data = new double[n*m];
-    }
-
-    ~Matrix()
-    {
-        if(data)
-            delete[] data;
-    }
-
-    double& operator()(const int &i, const int &j)
-    {
-        return data[i*sizeY+j];
-    }
-};
 
 class Solver
 {
@@ -60,7 +35,6 @@ public:
     void init();
     void solve();
     void correct();
-    void solve(Matrix &u0, Matrix &u, Matrix &v0, Matrix &v, double h, double dt);
 
     int size;
     double dt, du, dv, tau, sigma, lambda, k, b, d;

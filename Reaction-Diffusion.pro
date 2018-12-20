@@ -30,14 +30,19 @@ SOURCES += \
     mainwindow.cpp \
     rdwidget.cpp \
     solver.cpp \
-    tinyexpr.c
+    tinyexpr.c \
+    openglwindow.cpp \
+    surface.cpp
 
 HEADERS += \
     glwidget.h \
     mainwindow.h \
     rdwidget.h \
     solver.h \
-    tinyexpr.h
+    tinyexpr.h \
+    openglwindow.h \
+    matrix.h \
+    surface.h
 
 FORMS += \
     mainwindow.ui
@@ -50,4 +55,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 SUBDIRS += \
     Reaction-Diffusion.pro
 
-DISTFILES +=
+DISTFILES += \
+    shader.frag \
+    shader.vert
+
+RESOURCES += \
+    res.qrc

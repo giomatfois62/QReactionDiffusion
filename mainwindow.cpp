@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include "solver.h"
+#include "openglwindow.h"
 
 #include <QGraphicsPixmapItem>
 #include <QPainter>
@@ -329,4 +330,12 @@ void MainWindow::on_loadModel_clicked()
 void MainWindow::on_skipFrames_editingFinished()
 {
     ui->rdWidget->setFramesToSkip(ui->skipFrames->value());
+}
+
+void MainWindow::on_render_clicked()
+{
+    Surface surf = ui->rdWidget->surface();
+    OpenGLWindow *window = new OpenGLWindow(surf);
+    window->resize(640,480);
+    window->show();
 }

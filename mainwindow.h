@@ -35,6 +35,8 @@ private slots:
 
     void on_skipFrames_editingFinished();
 
+    void on_render_clicked();
+
 protected:
     void showEvent(QShowEvent *event);
 

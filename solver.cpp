@@ -92,38 +92,6 @@ void Solver::correct()
     u0 = u1; v0 = v1;
 }
 
-void Solver::solve(Matrix &u0, Matrix &u, Matrix &v0, Matrix &v, double h, double dt)
-{
-    if(!fu_expr || !fv_expr)
-        return;
-
-    //double h = 2.0f / (size -1);
-    double invh = 1.0f / (3 * h * h);
-
-    du = m_model.params["du"].value;
-    dv = m_model.params["dv"].value;
-
-    for(int i = 1; i < size - 1; i++)
-    {
-        for(int j = 1; j < size - 1; j++)
-        {
-            u(i,j) =  u0(i,j) + dt * (invh * du /** laplace(u0, i, j)*/ + fu(u0(i,j), v0(i,j)));
-            v(i,j) =  v0(i,j) + dt * (invh * dv /** laplace(v0, i, j)*/ + fv(u0(i,j), v0(i,j)));
-
-            updateLimits(u(i,j), v(i,j));
-        }
-    }
-
-    // set boundary conditions
-//    for(int i = 0; i < size; i++)
-//    {
-//        u[i][0] = u[i][1]; u[i][size - 1] = u[i][size - 2]; u[0][i] = u[1][i]; u[size - 1][i] = u[size - 2][i];
-//        v[i][0] = v[i][1]; v[i][size - 1] = v[i][size - 2]; v[0][i] = v[1][i]; v[size - 1][i] = v[size - 2][i];
-//    }
-
-    u0 = u; v0 = v;
-}
-
 void Solver::setSize(int val)
 {
     if(val <= 1)

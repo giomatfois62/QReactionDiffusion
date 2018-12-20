@@ -152,3 +152,14 @@ QPixmap RDWidget::pixmap() const
 {
     return m_pixmap;
 }
+
+Surface RDWidget::surface()
+{
+    Matrix<float> mat(m_solver.size, m_solver.size);
+    for(int i = 0; i < m_solver.size; i++)
+        for(int j = 0; j < m_solver.size; j++)
+            mat(i,j) = 1.0f - (m_solver.u0[i][j] - m_solver.minu) / (m_solver.maxu - m_solver.minu);
+
+    Surface surf(mat);
+    return surf;
+}
